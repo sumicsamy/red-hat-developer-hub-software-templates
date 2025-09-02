@@ -1,0 +1,1 @@
+Template to expose postgres as a service in developer hub

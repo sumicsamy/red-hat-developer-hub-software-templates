@@ -1,0 +1,94 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: postgres-dbaas-gitops
+  title: PostgreSQL Database as a Service (GitOps)
+  description: |
+    Provision a PostgreSQL instance via GitOps. Generates manifests in a Git repo and deploys using Argo CD.
+  tags:
+    - database
+    - postgres
+    - gitops
+    - argo
+spec:
+  owner: platform-team
+  type: service
+
+  parameters:
+    - title: Database Info
+      required: [name, namespace, repoUrl, argoProject]
+      properties:
+        name:
+          title: Database Name
+          type: string
+        namespace:
+          title: Namespace
+          type: string
+          default: dbaas
+        username:
+          title: DB Username
+          type: string
+          default: dbuser
+        password:
+          title: DB Password
+          type: string
+          ui:password: true
+        storage:
+          title: Storage Size
+          type: string
+          default: 5Gi
+        repoUrl:
+          title: Git Repository URL
+          type: string
+          description: Target Git repo (e.g. https://github.com/org/postgres-dbaas)
+        argoProject:
+          title: ArgoCD Project
+          type: string
+          default: default
+
+  steps:
+    - id: fetch
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          namespace: ${{ parameters.namespace }}
+          username: ${{ parameters.username }}
+          password: ${{ parameters.password }}
+          storage: ${{ parameters.storage }}
+
+    - id: publish
+      name: Publish to Git
+      action: publish:git
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+        commitMessage: "Add Postgres DB ${{ parameters.name }}"
+        sourcePath: ./
+
+    - id: register-argocd
+      name: Create ArgoCD Application
+      action: argocd:create-app
+      input:
+        appName: ${{ parameters.name }}-db
+        namespace: ${{ parameters.namespace }}
+        project: ${{ parameters.argoProject }}
+        repoUrl: ${{ parameters.repoUrl }}
+        targetRevision: main
+        path: k8s
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+        destination:
+          namespace: ${{ parameters.namespace }}
+          server: https://kubernetes.default.svc
+
+  output:
+    links:
+      - title: View Git Repo
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: View in Argo CD
+        url: https://argocd-server-argocd.apps.cluster.example.com/applications/${{ parameters.name }}-db
