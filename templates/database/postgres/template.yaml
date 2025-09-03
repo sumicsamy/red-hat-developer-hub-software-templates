@@ -16,7 +16,7 @@ spec:
 
   parameters:
     - title: Database Info
-      required: [name, namespace, repoUrl, argoProject]
+      required: [name, namespace, repository, argoProject]
       properties:
         name:
           title: Database Name
