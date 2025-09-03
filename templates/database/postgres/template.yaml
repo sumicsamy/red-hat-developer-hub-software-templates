@@ -73,8 +73,8 @@ spec:
       name: Create ArgoCD Application
       action: argocd:create-resources
       input:
-        appName: ${{ parameters.name }}-db
-        argoInstance: ${{ parameters.argoinstance }}
+        appName: ${{ parameters.name }}
+        argoInstance: argoInstance1
         namespace: ${{ parameters.namespace }}
         repoUrl: ${{ steps.publish.output.repoContentsUrl }}
         labelValue: ${{ parameters.name }}
