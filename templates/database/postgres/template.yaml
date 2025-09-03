@@ -71,14 +71,16 @@ spec:
 
     - id: register-argocd
       name: Create ArgoCD Application
-      action: argocd:create-app
+      action: argocd:create-resources
       input:
         appName: ${{ parameters.name }}-db
+        argoInstance: ${{ parameters.argoinstance }}
         namespace: ${{ parameters.namespace }}
-        project: ${{ parameters.argoProject }}
         repoUrl: ${{ steps.publish.output.repoContentsUrl }}
+        labelValue: ${{ parameters.name }}
+        path: "k8s"
+        project: ${{ parameters.argoProject }}
         targetRevision: main
-        path: k8s
         syncPolicy:
           automated:
             prune: true
