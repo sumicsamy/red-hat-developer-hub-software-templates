@@ -11,7 +11,7 @@ metadata:
     - gitops
     - argo
 spec:
-  owner: platform-team
+  owner: group:default/platform-team
   type: service
 
   parameters:
@@ -73,7 +73,7 @@ spec:
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}/blob/main/catalog-info.yaml
 
     - id: register-argocd
       name: Create ArgoCD Application
