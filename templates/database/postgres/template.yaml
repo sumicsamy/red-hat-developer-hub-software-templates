@@ -37,10 +37,10 @@ spec:
           title: Storage Size
           type: string
           default: 5Gi
-        repoUrl:
+        repository:
           title: Git Repository URL
           type: string
-          description: Target Git repo (e.g. https://github.com/org/postgres-dbaas)
+          description: Target Git repo (postgres-dbaas)
         argoProject:
           title: ArgoCD Project
           type: string
@@ -60,13 +60,20 @@ spec:
           storage: ${{ parameters.storage }}
 
     - id: publish
-      name: Publish to Git
-      action: publish:git
+      name: Publish to GitHub
+      action: publish:github
       input:
-        repoUrl: ${{ parameters.repoUrl }}
+        repoUrl: github.com?owner=sumicsamy&repo=${{ parameters.repository }}
+        description: "Database manifests provisioned by RHDH"
         defaultBranch: main
-        commitMessage: "Add Postgres DB ${{ parameters.name }}"
-        sourcePath: ./
+        protectDefaultBranch: true
+        repoVisibility: private
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
 
     - id: register-argocd
       name: Create ArgoCD Application
@@ -75,7 +82,7 @@ spec:
         appName: ${{ parameters.name }}-db
         namespace: ${{ parameters.namespace }}
         project: ${{ parameters.argoProject }}
-        repoUrl: ${{ parameters.repoUrl }}
+        repoUrl: ${{ steps.publish.output.repoContentsUrl }}
         targetRevision: main
         path: k8s
         syncPolicy:
@@ -89,6 +96,6 @@ spec:
   output:
     links:
       - title: View Git Repo
-        url: ${{ steps.publish.output.remoteUrl }}
+        url: ${{ steps.publish.output.repoContentsUrl }}
       - title: View in Argo CD
-        url: https://argocd-server-argocd.apps.cluster.example.com/applications/${{ parameters.name }}-db
+        url: https://argocd-server-argocd.apps.sno.neat-monster.com/applications/${{ parameters.name }}-db
