@@ -75,7 +75,7 @@ spec:
       input:
         appName: ${{ parameters.name }}
         argoInstance: argoInstance1
-        namespace: ${{ parameters.namespace }}
+        namespace: openshift-gitops
         repoUrl: ${{ steps.publish.output.remoteUrl }}
         labelValue: ${{ parameters.name }}
         path: "k8s"
@@ -94,4 +94,4 @@ spec:
       - title: View Git Repo
         url: ${{ steps.publish.output.remoteUrl }}
       - title: View in Argo CD
-        url: https://openshift-gitops-server-openshift-gitops.apps.sno.neat-monster.com//applications/${{ parameters.name }}-db
+        url: https://openshift-gitops-server-openshift-gitops.apps.sno.neat-monster.com/applications/${{ parameters.name }}
