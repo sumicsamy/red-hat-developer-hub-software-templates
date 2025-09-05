@@ -67,7 +67,7 @@ spec:
         description: "Database manifests provisioned by RHDH"
         defaultBranch: main
         protectDefaultBranch: true
-        repoVisibility: private
+        repoVisibility: public
 
     - id: register-argocd
       name: Create ArgoCD Application
@@ -75,19 +75,10 @@ spec:
       input:
         appName: ${{ parameters.name }}
         argoInstance: argoInstance1
-        namespace: openshift-gitops
+        namespace: ${{ parameters.namespace }}
         repoUrl: ${{ steps.publish.output.remoteUrl }}
-        labelValue: ${{ parameters.name }}
         path: "k8s"
-        project: ${{ parameters.argoProject }}
-        targetRevision: main
-        syncPolicy:
-          automated:
-            prune: true
-            selfHeal: true
-        destination:
-          namespace: ${{ parameters.namespace }}
-          server: https://kubernetes.default.svc
+        projectName: ${{ parameters.argoProject }}
 
   output:
     links:
