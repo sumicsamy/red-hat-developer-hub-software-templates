@@ -1,15 +1,15 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: ${{ values.name }}-db
+  name: ${{ values.name }}
   description: "Postgres DB instance provisioned via RHDH template"
   annotations:
     backstage.io/techdocs-ref: dir:.
-    argocd/app-name: ${{ values.name }}-db
+    argocd/app-name: ${{ values.name }}
     argocd/app-namespace: openshift-gitops
     argocd/instance: openshift-gitops
   labels:
-    app.kubernetes.io/part-of: ${{ values.name }}-db
+    app.kubernetes.io/part-of: ${{ values.name }}
     app.kubernetes.io/managed-by: rhdh-scaffolder
 spec:
   type: service
